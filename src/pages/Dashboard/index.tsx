@@ -1,6 +1,7 @@
 import React, { useState }  from 'react';
 import { Text, SafeAreaView, TouchableOpacity, TextInput, StyleSheet} from 'react-native'
 import { useNavigation } from '@react-navigation/native';
+import { api } from '../../services/api';
 
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { StackParamsList } from '../../routes/app.routes';
@@ -15,8 +16,18 @@ async function openOrder(){
 if(number === ''){
   return
 }
+
+const response = await api.post ('/order' , {
+  // Number com primeira letra maiscula pra converter string em numero, number estava vindo como string da captura do input
+  table:Number(number)
+})
+
+//console.log (response.data)
+
+
 // precisa fazer a requisição e abrir a mesa e navegar para proxima sala
-navigation.navigate('Order', {number: number, order_id: "d1b698ec-c78a-45cb-81c9-ded3a22d8ae2" })
+navigation.navigate('Order', {number: number, order_id: response.data.id })
+setNumber ('')
 }
 
   return(
