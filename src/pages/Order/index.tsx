@@ -5,7 +5,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
-  Modal
+  Modal,
+  FlatList
 } from 'react-native'
 
 import { api } from '../../services/api'
@@ -31,6 +32,14 @@ type ProductProps = {
   name: string
 }
 
+type ItemsProps = {
+  id: string;
+  product_id: string;
+  name: string;
+  amount: string | number
+
+}
+
 type OrderRouteProps = RouteProp<RouteDetailParams, 'Order'>;
 
 export default function Order() {
@@ -49,6 +58,8 @@ export default function Order() {
 
   const [amount, setAmount] = useState('1')
 
+  const [items, setItems] = useState <ItemsProps []> ([])
+
   useEffect(() => {
     async function loadInfo() {
       const response = await api.get('/category')
@@ -59,202 +70,211 @@ export default function Order() {
     }
     loadInfo()
 
-  },[])
+  }, [])
 
-    useEffect(() => {
-      async function loadProducts() {
-        const response = await api.get('/category/product', {
-          params: {
-            category_id: categorySelected?.id
-          }
-        })
-        // console.log ('============================>')
-        // console.log(response.data)
-        setProducts(response.data)
-        setProductSelected(response.data[0])
-      }
-
-      loadProducts()
-    }, [categorySelected])
-
-
-    async function HandleCloseOrder() {
-      try {
-        await api.delete('/order', {
-          params: {
-            // recebemos o parametro pela rota atraves de route.params?.order_id
-            order_id: route.params?.order_id
-          }
-        })
-
-        navigation.goBack()
-
-      } catch (err) {
-        console.log(err)
-      }
+  useEffect(() => {
+    async function loadProducts() {
+      const response = await api.get('/category/product', {
+        params: {
+          category_id: categorySelected?.id
+        }
+      })
+      // console.log ('============================>')
+      // console.log(response.data)
+      setProducts(response.data)
+      setProductSelected(response.data[0])
     }
 
-    function handleSelectedItem(item: CategoryProps) {
-      setCategorySelected(item)
+    loadProducts()
+  }, [categorySelected])
+
+
+  async function HandleCloseOrder() {
+    try {
+      await api.delete('/order', {
+        params: {
+          // recebemos o parametro pela rota atraves de route.params?.order_id
+          order_id: route.params?.order_id
+        }
+      })
+
+      navigation.goBack()
+
+    } catch (err) {
+      console.log(err)
     }
-
-    function handleChangeProduct(item: ProductProps){
-
-    }
-
-
-    return (
-
-
-      <View style={styles.container}>
-
-        <View style={styles.header}>
-          <Text style={styles.title}>Mesa {route.params.number}</Text>
-          <TouchableOpacity
-            onPress={HandleCloseOrder}
-          >
-            <Feather name="trash-2" size={28} color="#FF3F4b" />
-          </TouchableOpacity>
-        </View>
-
-        {/* se a lista de categoria for diferente de vazio quer dizer que ja recebemos a lista da api com useEfect e podemos mostrar o botao */}
-        {category.length !== 0 && (
-          <TouchableOpacity
-            onPress={() => setmodalCategoryVisible(true)}
-            style={styles.input}>
-            <Text style={{ color: '#FFF' }}>
-              {categorySelected?.name}
-            </Text>
-          </TouchableOpacity>
-        )}
-
-        {products.length !== 0 && (
-          <TouchableOpacity style={styles.input}
-          onPress = {() =>setModalProductVisible(true)}
-          >
-            <Text style={{ color: '#FFF' }}>{procuctSelected?.name}</Text>
-          </TouchableOpacity>
-
-        )}
-
-
-        <View style={styles.qtdContainer}>
-          <Text style={styles.qtdText}>Quantidade</Text>
-          <TextInput
-            style={[styles.input, { width: '60%', textAlign: 'center' }]}
-            placeholderTextColor="#F0F0F0"
-            keyboardType="numeric"
-            value={amount}
-            onChangeText={setAmount}
-          />
-        </View>
-
-        <View style={styles.actions}>
-          <TouchableOpacity style={styles.buttonAdd}>
-            <Text style={styles.buttonText}>+</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Avançar</Text>
-          </TouchableOpacity>
-        </View>
-
-        <Modal
-          transparent={true}
-          visible={modalCategoryVisible}
-          animationType='fade'
-        >
-          <ModalPicker
-            handleCloseModal={() => setmodalCategoryVisible(false)}
-            options={category}
-            selecttedItem={handleSelectedItem}
-          />
-        </Modal>
-
-
-        <Modal
-        transparent = {true}
-        visible = {modalProductVisible}
-        animationType= 'fade'
-        >
-
-            <ModalPicker
-            handleCloseModal={() => setModalProductVisible(false)}
-            options={products}
-            selecttedItem={handleChangeProduct}
-          />
-
-        </Modal>
-
-      </View>
-    )
   }
 
+  function handleSelectedItem(item: CategoryProps) {
+    setCategorySelected(item)
+  }
+
+  function handleChangeProduct(item: ProductProps) {
+    setCategorySelected(item)
+  }
+
+
+  return (
+
+
+    <View style={styles.container}>
+
+      <View style={styles.header}>
+        <Text style={styles.title}>Mesa {route.params.number}</Text>
+        <TouchableOpacity
+          onPress={HandleCloseOrder}
+        >
+          <Feather name="trash-2" size={28} color="#FF3F4b" />
+        </TouchableOpacity>
+      </View>
+
+      {/* se a lista de categoria for diferente de vazio quer dizer que ja recebemos a lista da api com useEfect e podemos mostrar o botao */}
+      {category.length !== 0 && (
+        <TouchableOpacity
+          onPress={() => setmodalCategoryVisible(true)}
+          style={styles.input}>
+          <Text style={{ color: '#FFF' }}>
+            {categorySelected?.name}
+          </Text>
+        </TouchableOpacity>
+      )}
+
+      {products.length !== 0 && (
+        <TouchableOpacity style={styles.input}
+          onPress={() => setModalProductVisible(true)}
+        >
+          <Text style={{ color: '#FFF' }}>{procuctSelected?.name}</Text>
+        </TouchableOpacity>
+
+      )}
+
+
+      <View style={styles.qtdContainer}>
+        <Text style={styles.qtdText}>Quantidade</Text>
+        <TextInput
+          style={[styles.input, { width: '60%', textAlign: 'center' }]}
+          placeholderTextColor="#F0F0F0"
+          keyboardType="numeric"
+          value={amount}
+          onChangeText={setAmount}
+        />
+      </View>
+
+      <View style={styles.actions}>
+        <TouchableOpacity style={styles.buttonAdd}>
+          <Text style={styles.buttonText}>+</Text>
+        </TouchableOpacity>
+
+
+        <TouchableOpacity 
+        style={[styles.button, {opacity: items.length ===0 ? 0.3 : 1}]}
+        disabled={items.length === 0 }
+        >
+          <Text style={styles.buttonText}>Avançar</Text>
+        </TouchableOpacity>
+      </View>
+
+      <FlatList
+      showsVerticalScrollIndicator ={false}
+      style ={{flex:1, marginTop: 24}}
+      />
+
+      <Modal
+        transparent={true}
+        visible={modalCategoryVisible}
+        animationType='fade'
+      >
+        <ModalPicker
+          handleCloseModal={() => setmodalCategoryVisible(false)}
+          options={category}
+          selecttedItem={handleSelectedItem}
+        />
+      </Modal>
+
+
+      <Modal
+        transparent={true}
+        visible={modalProductVisible}
+        animationType='fade'
+      >
+
+        <ModalPicker
+          handleCloseModal={() => setModalProductVisible(false)}
+          options={products}
+          selecttedItem={handleChangeProduct}
+        />
+
+      </Modal>
+
+    </View>
+  )
+}
+
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: '#1d1d2e',
-      paddingVertical: '5%',
-      paddingEnd: '4%',
-      paddingStart: '4%'
-    },
-    header: {
-      flexDirection: 'row',
-      marginBottom: 12,
-      alignItems: 'center',
-      marginTop: 24,
-    },
-    title: {
-      fontSize: 30,
-      fontWeight: 'bold',
-      color: '#FFF',
-      marginRight: 14
-    },
-    input: {
-      backgroundColor: '#101026',
-      borderRadius: 4,
-      width: '100%',
-      height: 40,
-      marginBottom: 12,
-      justifyContent: 'center',
-      paddingHorizontal: 8,
-      color: '#FFF',
-      fontSize: 20,
-    },
-    qtdContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between'
-    },
-    qtdText: {
-      fontSize: 20,
-      fontWeight: 'bold',
-      color: '#FFF'
-    },
-    actions: {
-      flexDirection: 'row',
-      width: '100%',
-      justifyContent: 'space-between'
-    },
-    buttonAdd: {
-      width: '20%',
-      backgroundColor: '#3fd1ff',
-      borderRadius: 4,
-      height: 40,
-      justifyContent: 'center',
-      alignItems: 'center'
-    },
-    buttonText: {
-      color: '#101026',
-      fontSize: 18,
-      fontWeight: 'bold'
-    },
-    button: {
-      backgroundColor: '#3fffa3',
-      borderRadius: 4,
-      height: 40,
-      width: '75%',
-      alignItems: 'center',
-      justifyContent: 'center'
-    }
-  })
+  container: {
+    flex: 1,
+    backgroundColor: '#1d1d2e',
+    paddingVertical: '5%',
+    paddingEnd: '4%',
+    paddingStart: '4%'
+  },
+  header: {
+    flexDirection: 'row',
+    marginBottom: 12,
+    alignItems: 'center',
+    marginTop: 24,
+  },
+  title: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: '#FFF',
+    marginRight: 14
+  },
+  input: {
+    backgroundColor: '#101026',
+    borderRadius: 4,
+    width: '100%',
+    height: 40,
+    marginBottom: 12,
+    justifyContent: 'center',
+    paddingHorizontal: 8,
+    color: '#FFF',
+    fontSize: 20,
+  },
+  qtdContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between'
+  },
+  qtdText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#FFF'
+  },
+  actions: {
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'space-between'
+  },
+  buttonAdd: {
+    width: '20%',
+    backgroundColor: '#3fd1ff',
+    borderRadius: 4,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  buttonText: {
+    color: '#101026',
+    fontSize: 18,
+    fontWeight: 'bold'
+  },
+  button: {
+    backgroundColor: '#3fffa3',
+    borderRadius: 4,
+    height: 40,
+    width: '75%',
+    alignItems: 'center',
+    justifyContent: 'center'
+  }
+})
