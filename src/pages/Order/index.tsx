@@ -12,6 +12,7 @@ import {
 import { api } from '../../services/api'
 import { ModalPicker } from '../../components/ModalPicker'
 import { useRoute, RouteProp, useNavigation } from '@react-navigation/native'
+import { ListItem } from '../../components/ListItem'
 import { Feather } from '@expo/vector-icons'
 
 
@@ -54,6 +55,7 @@ export default function Order() {
 
   const [products, setProducts] = useState<ProductProps[] | []>([])
   const [procuctSelected, setProductSelected] = useState<ProductProps | undefined>()
+  
   const [modalProductVisible, setModalProductVisible] = useState(false)
 
   const [amount, setAmount] = useState('1')
@@ -113,7 +115,24 @@ export default function Order() {
     setCategorySelected(item)
   }
 
+  async function handleAddItem() {
+    console.log ('oiiii')
+    const response = await api.post ('/order/add',{
+      order_id: route.params?.order_id,
+      product_id: procuctSelected?.id,
+      amount: Number(amount)
 
+    })
+
+    let data = {
+      id: response.data.id,
+      product_id:procuctSelected?.id as string,
+      name: procuctSelected?.name as string,
+      amount:amount
+    }
+
+    setItems(oldArray => [...oldArray, data])
+  }
   return (
 
 
@@ -160,8 +179,11 @@ export default function Order() {
         />
       </View>
 
-      <View style={styles.actions}>
-        <TouchableOpacity style={styles.buttonAdd}>
+      <View style={styles.actions}
+      >
+        <TouchableOpacity style={styles.buttonAdd}
+         onPress={handleAddItem}
+        >
           <Text style={styles.buttonText}>+</Text>
         </TouchableOpacity>
 
@@ -177,6 +199,9 @@ export default function Order() {
       <FlatList
       showsVerticalScrollIndicator ={false}
       style ={{flex:1, marginTop: 24}}
+      data ={items}
+      keyExtractor ={(item) => item.id}
+      renderItem ={({item})=> <ListItem data={item}/> }
       />
 
       <Modal
