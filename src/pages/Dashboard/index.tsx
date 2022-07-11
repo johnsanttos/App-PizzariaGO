@@ -1,12 +1,19 @@
-import React, { useState }  from 'react';
+import React, { useState, useContext }  from 'react';
 import { Text, SafeAreaView, TouchableOpacity, TextInput, StyleSheet} from 'react-native'
 import { useNavigation } from '@react-navigation/native';
 import { api } from '../../services/api';
 
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { StackParamsList } from '../../routes/app.routes';
+import { AuthContext } from '../../contexts/AuthContext';
+
+
+
 
 export default function Dashboard(){
+
+  const {signIn, signOut} = useContext (AuthContext)
+
 // tipagem para passar parametros por navegação
 const navigation = useNavigation <NativeStackNavigationProp <StackParamsList>>()
 const [number, setNumber] = useState ('')
@@ -22,7 +29,7 @@ const response = await api.post ('/order' , {
   table:Number(number)
 })
 
-//console.log (response.data)
+console.log ('aiiiii' , response.data)
 
 
 // precisa fazer a requisição e abrir a mesa e navegar para proxima sala
