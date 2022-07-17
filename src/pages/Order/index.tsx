@@ -55,12 +55,12 @@ export default function Order() {
 
   const [products, setProducts] = useState<ProductProps[] | []>([])
   const [procuctSelected, setProductSelected] = useState<ProductProps | undefined>()
-  
+
   const [modalProductVisible, setModalProductVisible] = useState(false)
 
   const [amount, setAmount] = useState('1')
 
-  const [items, setItems] = useState <ItemsProps []> ([])
+  const [items, setItems] = useState<ItemsProps[]>([])
 
   useEffect(() => {
     async function loadInfo() {
@@ -81,8 +81,8 @@ export default function Order() {
           category_id: categorySelected?.id
         }
       })
-      // console.log ('============================>')
-      // console.log(response.data)
+      console.log('============================>')
+      console.log('alokaaa', response.data)
       setProducts(response.data)
       setProductSelected(response.data[0])
     }
@@ -115,9 +115,10 @@ export default function Order() {
     setCategorySelected(item)
   }
 
+  // adicionando produto na mesa
   async function handleAddItem() {
-    console.log ('oiiii')
-    const response = await api.post ('/order/add',{
+    console.log('oiiii')
+    const response = await api.post('/order/add', {
       order_id: route.params?.order_id,
       product_id: procuctSelected?.id,
       amount: Number(amount)
@@ -126,9 +127,9 @@ export default function Order() {
 
     let data = {
       id: response.data.id,
-      product_id:procuctSelected?.id as string,
+      product_id: procuctSelected?.id as string,
       name: procuctSelected?.name as string,
-      amount:amount
+      amount: amount
     }
 
     setItems(oldArray => [...oldArray, data])
@@ -140,11 +141,14 @@ export default function Order() {
 
       <View style={styles.header}>
         <Text style={styles.title}>Mesa {route.params.number}</Text>
-        <TouchableOpacity
-          onPress={HandleCloseOrder}
-        >
-          <Feather name="trash-2" size={28} color="#FF3F4b" />
-        </TouchableOpacity>
+        {items.length === 0 && (
+          <TouchableOpacity
+            onPress={HandleCloseOrder}
+          >
+            <Feather name="trash-2" size={28} color='#dd0b19' />
+          </TouchableOpacity>
+
+        )}
       </View>
 
       {/* se a lista de categoria for diferente de vazio quer dizer que ja recebemos a lista da api com useEfect e podemos mostrar o botao */}
@@ -182,26 +186,26 @@ export default function Order() {
       <View style={styles.actions}
       >
         <TouchableOpacity style={styles.buttonAdd}
-         onPress={handleAddItem}
+          onPress={handleAddItem}
         >
           <Text style={styles.buttonText}>+</Text>
         </TouchableOpacity>
 
 
-        <TouchableOpacity 
-        style={[styles.button, {opacity: items.length ===0 ? 0.3 : 1}]}
-        disabled={items.length === 0 }
+        <TouchableOpacity
+          style={[styles.button, { opacity: items.length === 0 ? 0.3 : 1 }]}
+          disabled={items.length === 0}
         >
           <Text style={styles.buttonText}>Avançar</Text>
         </TouchableOpacity>
       </View>
 
       <FlatList
-      showsVerticalScrollIndicator ={false}
-      style ={{flex:1, marginTop: 24}}
-      data ={items}
-      keyExtractor ={(item) => item.id}
-      renderItem ={({item})=> <ListItem data={item}/> }
+        showsVerticalScrollIndicator={false}
+        style={{ flex: 1, marginTop: 24 }}
+        data={items}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => <ListItem data={item} />}
       />
 
       <Modal
@@ -295,7 +299,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   button: {
-    backgroundColor: '#3fffa3',
+    backgroundColor: '#0be27a',
     borderRadius: 4,
     height: 40,
     width: '75%',
