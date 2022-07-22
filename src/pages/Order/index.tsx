@@ -13,6 +13,8 @@ import { api } from '../../services/api'
 import { ModalPicker } from '../../components/ModalPicker'
 import { useRoute, RouteProp, useNavigation } from '@react-navigation/native'
 import { ListItem } from '../../components/ListItem'
+
+
 import { Feather } from '@expo/vector-icons'
 
 
@@ -54,7 +56,7 @@ export default function Order() {
   const [modalCategoryVisible, setmodalCategoryVisible] = useState(false)
 
   const [products, setProducts] = useState<ProductProps[] | []>([])
-  const [procuctSelected, setProductSelected] = useState<ProductProps | undefined>()
+  const [productSelected, setProductSelected] = useState<ProductProps | undefined>()
 
   const [modalProductVisible, setModalProductVisible] = useState(false)
 
@@ -116,24 +118,44 @@ export default function Order() {
   }
 
   // adicionando produto na mesa
-  async function handleAddItem() {
+  async function handleAdd() {
     console.log('oiiii')
     const response = await api.post('/order/add', {
       order_id: route.params?.order_id,
-      product_id: procuctSelected?.id,
+      product_id: productSelected?.id,
       amount: Number(amount)
 
     })
 
     let data = {
       id: response.data.id,
-      product_id: procuctSelected?.id as string,
-      name: procuctSelected?.name as string,
+      product_id: productSelected?.id as string,
+      name: productSelected?.name as string,
       amount: amount
+      
     }
 
     setItems(oldArray => [...oldArray, data])
+   
   }
+  
+async function handleDeleteItem (item_id: string) {
+await api.delete('/order/remove' ,{
+  params: {
+    item_id: item_id
+  }
+} )
+
+// apos remover da api removemos esse item da nossa lista de items
+
+let removeItem = items.filter ( item => {
+  return (item.id !== item_id)
+}
+
+)
+setItems(removeItem)
+}
+
   return (
 
 
@@ -166,7 +188,7 @@ export default function Order() {
         <TouchableOpacity style={styles.input}
           onPress={() => setModalProductVisible(true)}
         >
-          <Text style={{ color: '#FFF' }}>{procuctSelected?.name}</Text>
+          <Text style={{ color: '#FFF' }}>{productSelected?.name}</Text>
         </TouchableOpacity>
 
       )}
@@ -186,7 +208,7 @@ export default function Order() {
       <View style={styles.actions}
       >
         <TouchableOpacity style={styles.buttonAdd}
-          onPress={handleAddItem}
+          onPress={handleAdd}
         >
           <Text style={styles.buttonText}>+</Text>
         </TouchableOpacity>
@@ -205,7 +227,7 @@ export default function Order() {
         style={{ flex: 1, marginTop: 24 }}
         data={items}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <ListItem data={item} />}
+        renderItem={({ item }) => <ListItem data={item} deleteItem= {handleDeleteItem} />}
       />
 
       <Modal

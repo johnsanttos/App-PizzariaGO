@@ -4,12 +4,15 @@ import { createStackNavigator } from '@react-navigation/stack';
 import Dashboard from '../pages/Dashboard';
 import Order from '../pages/Order';
 
+import FinishOrder from '../FinishOrder';
+
 export type StackParamsList ={
     Dashboard: undefined;
     Order: {
     number: number | string;
     order_id: string
   }
+  FinishOrder: undefined
 }
 
 const Stack = createStackNavigator <StackParamsList>();
@@ -26,6 +29,11 @@ function AppRoutes(){
       name="Order" 
       component={Order} 
       options={{ headerShown: false }} />
+
+      <Stack.Screen
+      name="FinishOrder"
+      component ={FinishOrder}
+      />
     </Stack.Navigator>
   )
 }
