@@ -5,22 +5,22 @@ import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ScrollView } from
 
 
 interface ModalPickerProps {
-    options: CategoryProps[];
+    optionsCategory: CategoryProps[];
     handleCloseModal: () => void;
     selecttedItem: (item:CategoryProps) => void
 }
-
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window")
 
-export function ModalPicker({ options, handleCloseModal, selecttedItem }: ModalPickerProps) {
+export function ModalPicker({ optionsCategory, handleCloseModal, selecttedItem }: ModalPickerProps) {
 
     function onPressItem(item: CategoryProps) {
-        console.log(item)
+        console.log( 'oloco bixoo' , item)
         selecttedItem(item)
         handleCloseModal()
     }
 
-    const option = options.map((item, index) => (
+    // aqui esta fazendo um .map em category que chegou como props da tela order
+    const option = optionsCategory.map((item, index) => (
         <TouchableOpacity key={index} style={styles.option} onPress={() => onPressItem(item)} >
             <Text style={styles.item}>
                 {item?.name}
@@ -54,22 +54,24 @@ const styles = StyleSheet.create({
     content: {
         width: WIDTH - 20,
         height: HEIGHT / 2,
-        backgroundColor: '#fff',
+        backgroundColor: '#000060',
         borderWidth: 1,
         borderColor: '#8a8a8a',
-        borderRadius: 4
+        borderRadius: 4,
+      
 
     },
     option: {
         alignItems: 'flex-start',
         borderWidth: 0.8,
         borderColor: '#8a8a8a',
+       
     },
     item: {
         margin: 18,
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#101026'
+        color: '#fff'
     }
 
 })

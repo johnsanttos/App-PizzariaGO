@@ -1,33 +1,37 @@
-import React, { useState }  from 'react';
+import React, { useContext, useState }  from 'react';
 import { Text, SafeAreaView, TouchableOpacity, TextInput, StyleSheet} from 'react-native'
 import { useNavigation } from '@react-navigation/native';
 import { api } from '../../services/api';
 
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { StackParamsList } from '../../routes/app.routes';
+import { AuthContext } from '../../contexts/AuthContext'
 
 export default function Dashboard(){
 // tipagem para passar parametros por navegação
 const navigation = useNavigation <NativeStackNavigationProp <StackParamsList>>()
-const [number, setNumber] = useState ('')
+
+const { signOut } = useContext(AuthContext)
+
+const [numberTable, setNumberTable] = useState ('')
 
 async function openOrder(){
   // console.log ('mesa ' + number)
-if(number === ''){
+if(numberTable === ''){
   return
 }
 
 const response = await api.post ('/order' , {
   // Number com primeira letra maiscula pra converter string em numero, number estava vindo como string da captura do input
-  table:Number(number)
+  table:Number(numberTable)
 })
 
-//console.log (response.data)
+console.log (response.data)
 
 
 // precisa fazer a requisição e abrir a mesa e navegar para proxima sala
-navigation.navigate('Order', {number: number, order_id: response.data.id })
-setNumber ('')
+navigation.navigate('Order', {number: numberTable, order_id: response.data.id })
+setNumberTable ('')
 }
 
   return(
@@ -39,8 +43,8 @@ setNumber ('')
           placeholderTextColor="#F0F0F0"
           style={styles.input}
           keyboardType="numeric"
-          value={number}
-          onChangeText = {setNumber}
+          value={numberTable}
+          onChangeText = {setNumberTable}
         />
 
         <TouchableOpacity 
@@ -49,6 +53,10 @@ setNumber ('')
         >
           <Text style={styles.buttonText}>Abrir mesa</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity style={styles.buttonLogout} onPress={signOut}>
+        <Text style={styles.buttonTextLogout}> Deslogar </Text>
+      </TouchableOpacity>
 
     </SafeAreaView>
   )
@@ -90,6 +98,22 @@ const styles = StyleSheet.create({
   buttonText:{
     fontSize: 18,
     color: '#101026',
-    fontWeight: 'bold'
-  }
+    fontWeight: 'bold',
+    
+  },
+
+  buttonLogout:{
+    width: '90%',
+    height: 60,
+    backgroundColor: '#ff0000',
+    borderRadius: 4,
+    marginVertical: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
+  },
+  buttonTextLogout: {
+    fontSize: 22,
+    color: '#fff',
+    fontWeight: 'bold',}
 })

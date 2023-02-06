@@ -47,25 +47,26 @@ export default function Order() {
   const route = useRoute<OrderRouteProps>();
   const navigation = useNavigation()
 
-  // Listagem de categoria / usando a tipagem da categoria no usestate
+  // Listagem de categoria / usando a tipagem da categoria no usestate // pode ser um array com objetos ou array vazia
   const [category, setCategory] = useState<CategoryProps[] | []>([])
   //reaproveitando a tipagem
   const [categorySelected, setCategorySelected] = useState<CategoryProps | undefined>()
   const [modalCategoryVisible, setmodalCategoryVisible] = useState(false)
 
+
   const [products, setProducts] = useState<ProductProps[] | []>([])
   const [procuctSelected, setProductSelected] = useState<ProductProps | undefined>()
-  
   const [modalProductVisible, setModalProductVisible] = useState(false)
 
-  const [amount, setAmount] = useState('1')
 
+  const [amount, setAmount] = useState('1')
   const [items, setItems] = useState <ItemsProps []> ([])
 
   useEffect(() => {
+    // requisição buscando categorias
     async function loadInfo() {
       const response = await api.get('/category')
-      // console.log(response.data)
+       //console.log(' Essa fera ai meu',response.data)
       setCategory(response.data)
       setCategorySelected(response.data[0])
 
@@ -82,7 +83,7 @@ export default function Order() {
         }
       })
       // console.log ('============================>')
-      // console.log(response.data)
+       console.log('eitaaaa', response.data)
       setProducts(response.data)
       setProductSelected(response.data[0])
     }
@@ -116,7 +117,6 @@ export default function Order() {
   }
 
   async function handleAddItem() {
-    console.log ('oiiii')
     const response = await api.post ('/order/add',{
       order_id: route.params?.order_id,
       product_id: procuctSelected?.id,
@@ -130,7 +130,7 @@ export default function Order() {
       name: procuctSelected?.name as string,
       amount:amount
     }
-
+//oldArray toda a lista que eu ja tenho ... e adiciono o data a minha lista
     setItems(oldArray => [...oldArray, data])
   }
   return (
@@ -211,7 +211,7 @@ export default function Order() {
       >
         <ModalPicker
           handleCloseModal={() => setmodalCategoryVisible(false)}
-          options={category}
+          optionsCategory={category}
           selecttedItem={handleSelectedItem}
         />
       </Modal>
@@ -225,7 +225,7 @@ export default function Order() {
 
         <ModalPicker
           handleCloseModal={() => setModalProductVisible(false)}
-          options={products}
+          optionsCategory={products}
           selecttedItem={handleChangeProduct}
         />
 
