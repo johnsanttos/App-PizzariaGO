@@ -6,14 +6,16 @@ import {
   TouchableOpacity,
   TextInput,
   Modal,
-  FlatList
+  FlatList 
 } from 'react-native'
-
+import {StackNavigationProp} from '@react-navigation/stack'
 import { api } from '../../services/api'
 import { ModalPicker } from '../../components/ModalPicker'
 import { useRoute, RouteProp, useNavigation } from '@react-navigation/native'
 import { ListItem } from '../../components/ListItem'
 import { Feather } from '@expo/vector-icons'
+import { StackParamsList } from '../../routes/app.routes'
+
 
 
 type RouteDetailParams = {
@@ -45,7 +47,7 @@ type OrderRouteProps = RouteProp<RouteDetailParams, 'Order'>;
 
 export default function Order() {
   const route = useRoute<OrderRouteProps>();
-  const navigation = useNavigation()
+  const navigation = useNavigation <StackNavigationProp <StackParamsList>>()
 
   // Listagem de categoria / usando a tipagem da categoria no usestate // pode ser um array com objetos ou array vazia
   const [category, setCategory] = useState<CategoryProps[] | []>([])
@@ -83,7 +85,7 @@ export default function Order() {
         }
       })
       // console.log ('============================>')
-       console.log('eitaaaa', response.data)
+       //console.log('eitaaaa', response.data)
       setProducts(response.data)
       setProductSelected(response.data[0])
     }
@@ -133,6 +135,28 @@ export default function Order() {
 //oldArray toda a lista que eu ja tenho ... e adiciono o data a minha lista
     setItems(oldArray => [...oldArray, data])
   }
+
+
+  async function handleDeleteItem(item_id: string){
+  await api.delete('/order/remove',{
+    params:{
+    item_id:item_id
+  }
+  })
+
+//apos remover da api removemos ess item da nossa lista de items
+
+//.filter() metodo do javascript que vai percorrer todo o array e devolver todos que nao clicamos
+let removeItem = items.filter(item => {
+  return (item.id !== item_id)
+  
+})
+setItems(removeItem)
+  }
+
+  function handleFinishOrder (){
+    navigation.navigate("FinishOrder")
+  }
   return (
 
 
@@ -140,11 +164,15 @@ export default function Order() {
 
       <View style={styles.header}>
         <Text style={styles.title}>Mesa {route.params.number}</Text>
-        <TouchableOpacity
-          onPress={HandleCloseOrder}
-        >
-          <Feather name="trash-2" size={28} color="#FF3F4b" />
-        </TouchableOpacity>
+     { items.length === 0 && (
+         <TouchableOpacity
+         onPress={HandleCloseOrder}
+       >
+         <Feather name="trash-2" size={28} color="#FF3F4b" />
+       </TouchableOpacity>
+     ) 
+
+     }
       </View>
 
       {/* se a lista de categoria for diferente de vazio quer dizer que ja recebemos a lista da api com useEfect e podemos mostrar o botao */}
@@ -189,6 +217,7 @@ export default function Order() {
 
 
         <TouchableOpacity 
+        onPress={handleFinishOrder}
         style={[styles.button, {opacity: items.length ===0 ? 0.3 : 1}]}
         disabled={items.length === 0 }
         >
@@ -201,7 +230,7 @@ export default function Order() {
       style ={{flex:1, marginTop: 24}}
       data ={items}
       keyExtractor ={(item) => item.id}
-      renderItem ={({item})=> <ListItem data={item}/> }
+      renderItem ={({item})=> <ListItem data={item} deleteItem ={handleDeleteItem}/> }
       />
 
       <Modal
