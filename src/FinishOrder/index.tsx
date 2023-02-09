@@ -4,6 +4,11 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { Feather } from '@expo/vector-icons'
 
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native'
+import { StackNavigationProp } from '@react-navigation/stack'
+
+import {api} from '../services/api'
+import { StackParamsList } from '../routes/app.routes'
+
 
 type RouteDetailParams = {
   FinishOrder: {
@@ -16,11 +21,25 @@ type RouteDetailParams = {
 type FinishOrderRouteProp = RouteProp<RouteDetailParams, 'FinishOrder'>
 
 
+
+
+
+
 export default function FinishOrder(){
   const route = useRoute<FinishOrderRouteProp>();
+  const navigation = useNavigation<StackNavigationProp<StackParamsList>>()
 
   async function handleFinish(){
-    alert("CLICOU")
+    try {
+      await api.put('/order/send', {
+        order_id: route.params?.order_id
+      })
+      //voltar para primeira tela
+      navigation.popToTop()
+
+    }catch(err){
+      console.log("Erro ao finalizar , tente mais tarde")
+    }
   }
 
 

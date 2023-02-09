@@ -5,14 +5,17 @@ import Dashboard from '../pages/Dashboard';
 import Order from '../pages/Order';
 import FinishOrder from '../FinishOrder';
 
+//parametros que eu quero passar quando for navegar para a tela
 export type StackParamsList ={
     Dashboard: undefined;
     Order: {
     number: number | string;
     order_id: string
   }
-  FinishOrder: undefined
-}
+  FinishOrder: {
+    number: number | string;
+    order_id: string
+  }}
 
 const Stack = createStackNavigator <StackParamsList>();
 
